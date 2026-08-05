@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prolific - Premium Task Platform</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #8b5cf6;
+            --bg-dark: #0f172a;
+            --bg-card: rgba(6, 8, 10, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.05);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.15) 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .glass {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        nav {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .hero {
+            padding: 8rem 0 4rem;
+        }
+
+        .hero-flex {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+            flex-wrap: wrap;
+            text-align: left;
+        }
+
+        .hero-content {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-img {
+            flex: 1;
+            min-width: 300px;
+            text-align: right;
+        }
+
+        .hero-img img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 4rem 0;
+        }
+
+        .task-card {
+            padding: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            background: var(--glass);
+            color: var(--accent);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            align-self: flex-start;
+        }
+
+        .task-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .task-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .reward {
+            color: #10b981;
+            font-size: 1.1rem;
+        }
+
+        .locked-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 0;
+            transition: var(--transition);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .task-card:hover .locked-overlay {
+            opacity: 1;
+        }
+
+        .locked-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 500px;
+            padding: 3rem;
+            text-align: center;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.2);
+        }
+
+        .pricing-card {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--glass);
+            border-radius: 12px;
+            border: 1px solid var(--primary);
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .price span {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+
+        .filter-btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-flex {
+                text-align: center;
+            }
+
+            .hero-img {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const tasks = [
+            { id: 1, title: "Consumer Electronics Feedback", category: "Survey", reward: "$2.50", time: "10 mins", description: "Share your thoughts on the latest smartphone features and design." },
+            { id: 2, title: "Eco-Friendly Packaging Review", category: "Writing", reward: "$5.00", time: "20 mins", description: "Write a short review based on images of sustainable packaging solutions." },
+            { id: 3, title: "Audio Transcription: Customer Support", category: "Transcription", reward: "$8.00", time: "15 mins", description: "Transcribe short audio clips from customer service interactions." },
+            { id: 4, title: "Street View Object Identification", category: "Data Labeling", reward: "$1.20", time: "5 mins", description: "Identify and label traffic signs in provided street images." },
+            { id: 5, title: "Brand Perception Research", category: "Survey", reward: "$3.75", time: "12 mins", description: "Evaluate the visual identity of leading global brands." },
+            { id: 6, title: "Creative Storytelling Draft", category: "Writing", reward: "$12.00", time: "45 mins", description: "Create a 500-word story based on a specific set of prompts." },
+            { id: 7, title: "Medical Record Digitization", category: "Transcription", reward: "$15.00", time: "30 mins", description: "Handwritten medical note transcription for digital records." },
+            { id: 8, title: "Pedestrian Movement Tracking", category: "Data Labeling", reward: "$2.10", time: "8 mins", description: "Draw bounding boxes around pedestrians in video frames." },
+            { id: 9, title: "Work-Life Balance Study", category: "Survey", reward: "$1.50", time: "15 mins", description: "How has remote work affected your daily routine?" },
+            { id: 10, title: "Product Description Optimization", category: "Writing", reward: "$4.50", time: "15 mins", description: "Enhance product descriptions for better SEO performance." },
+            { id: 11, title: "Multi-speaker Meeting Transcription", category: "Transcription", reward: "$20.00", time: "40 mins", description: "Transcribe a recorded business meeting with 3+ participants." },
+            { id: 12, title: "Autonomous Vehicle Obstacle Detection", category: "Data Labeling", reward: "$3.50", time: "10 mins", description: "Categorize obstacles in night-vision camera feeds." },
+            { id: 13, title: "Vacation Habits Survey", category: "Survey", reward: "$2.00", time: "8 mins", description: "Tell us about your favorite travel destinations and budget." },
+            { id: 14, title: "Real Estate Property Descriptions", category: "Writing", reward: "$6.00", time: "20 mins", description: "Write compelling descriptions for high-end residential listings." },
+            { id: 15, title: "Legal Document Summarization", category: "Writing", reward: "$25.00", time: "60 mins", description: "Summarize complex legal clauses into plain English." },
+            { id: 16, title: "Satellite Imagery Analysis", category: "Data Labeling", reward: "$5.00", time: "15 mins", description: "Identify building footprints in high-resolution satellite shots." },
+            { id: 17, title: "Gaming Behavior Survey", category: "Survey", reward: "$3.20", time: "12 mins", description: "Focusing on micro-transaction habits in mobile gaming." },
+            { id: 18, title: "Technical Manual Proofreading", category: "Writing", reward: "$18.00", time: "50 mins", description: "Review and fix errors in industrial equipment manuals." },
+            { id: 19, title: "Foreign Language Audio Extraction", category: "Transcription", reward: "$30.00", time: "25 mins", description: "Extract specific phrases from Spanish audio recordings." },
+            { id: 20, title: "Retail Shelf Inventory Check", category: "Data Labeling", reward: "$1.80", time: "6 mins", description: "Count missing items on supermarket shelf photos." },
+            { id: 21, title: "AI Chatbot Sentiment Analysis", category: "Survey", reward: "$0.50", time: "2 mins", description: "Categorize the tone of AI responses as helpful or repetitive." },
+            { id: 22, title: "Social Media Trend Analysis", category: "Survey", reward: "$4.00", time: "15 mins", description: "Rank currently trending topics by personal relevance." }
+        ];
+
+        const { useState } = React;
+
+        const TaskCard = ({ task, isLocked, onUnlock, onOpen }) => (
+            <div 
+                className={`task-card glass animate-fade-in ${isLocked ? 'locked' : ''}`}
+                style={{ cursor: isLocked ? 'default' : 'pointer' }}
+                onClick={() => !isLocked && onOpen(task)}
+            >
+                <span className="task-badge">{task.category}</span>
+                <h3>{task.title}</h3>
+                <p>{task.description}</p>
+                <div className="task-meta">
+                    <span>⏱ {task.time}</span>
+                    <span className="reward">{task.reward}</span>
+                </div>
+                {isLocked && (
+                    <div className="locked-overlay">
+                        <div className="locked-icon">🔒</div>
+                        <h4>Premium Task</h4>
+                        <p style={{ fontSize: '0.85rem', margin: '0.5rem 0 1.5rem', opacity: 0.8 }}>Upgrade your account to access high-paying tasks from OneForma, Prolific, and more.</p>
+                        <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={(e) => { e.stopPropagation(); onUnlock(); }}>Upgrade Now</button>
+                    </div>
+                )}
+            </div>
+        );
+
+        const App = () => {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [showAuthModal, setShowAuthModal] = useState(false);
+            const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+            const [isUpgraded, setIsUpgraded] = useState(false);
+            const [showModal, setShowModal] = useState(false);
+            const [selectedTask, setSelectedTask] = useState(null);
+            const [isTaskActive, setIsTaskActive] = useState(false);
+            const [taskProgress, setTaskProgress] = useState(1);
+            const [completedTasks, setCompletedTasks] = useState([]);
+            const [activeTab, setActiveTab] = useState('All');
+            const categories = ['All', 'Survey', 'Writing', 'Transcription', 'Data Labeling'];
+
+            const filteredTasks = (activeTab === 'All' 
+                ? tasks 
+                : tasks.filter(t => t.category === activeTab)).filter(t => !completedTasks.includes(t.id));
+
+            if (isTaskActive) {
+                return (
+                    <div className="container animate-fade-in" style={{ paddingTop: '5rem' }}>
+                        <div className="glass" style={{ padding: '3rem', maxWidth: '800px', margin: '0 auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                                <h2>{selectedTask.title}</h2>
+                                <span style={{ color: 'var(--primary)' }}>Question {taskProgress} of 3</span>
+                            </div>
+                            
+                            <div style={{ height: '6px', background: 'var(--glass)', borderRadius: '3px', marginBottom: '3rem' }}>
+                                <div style={{ height: '100%', background: 'var(--primary)', width: `${(taskProgress/3)*100}%`, transition: 'width 0.5s ease', borderRadius: '3px' }}></div>
+                            </div>
+
+                            {taskProgress === 1 && (
+                                <div className="animate-fade-in">
+                                    <h3 style={{ marginBottom: '1.5rem' }}>Which primary smartphone brand do you currently use?</h3>
+                                    <div style={{ display: 'grid', gap: '1rem' }}>
+                                        {['Apple (iPhone)', 'Samsung Galaxy', 'Google Pixel', 'Xiaomi / Redmi', 'Other'].map(brand => (
+                                            <button key={brand} className="filter-btn" style={{ textAlign: 'left', padding: '1rem' }} onClick={() => setTaskProgress(2)}>{brand}</button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {taskProgress === 2 && (
+                                <div className="animate-fade-in">
+                                    <h3 style={{ marginBottom: '1.5rem' }}>How would you rate the battery life of your current device?</h3>
+                                    <div style={{ display: 'grid', gap: '1rem' }}>
+                                        {['Excellent (2+ days)', 'Good (1.5 days)', 'Average (Full day)', 'Poor (Needs mid-day charge)'].map(rate => (
+                                            <button key={rate} className="filter-btn" style={{ textAlign: 'left', padding: '1rem' }} onClick={() => setTaskProgress(3)}>{rate}</button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {taskProgress === 3 && (
+                                <div className="animate-fade-in">
+                                    <h3 style={{ marginBottom: '1.5rem' }}>What is the most important feature to you in your next purchase?</h3>
+                                    <textarea 
+                                        placeholder="Type your thoughts here..." 
+                                        style={{ width: '100%', height: '120px', background: 'var(--glass)', border: '1px solid var(--border)', borderRadius: '12px', color: 'white', padding: '1rem', marginBottom: '2rem' }}
+                                    ></textarea>
+                                    <button className="btn-primary" style={{ width: '100%' }} onClick={() => {
+                                        setCompletedTasks([...completedTasks, selectedTask.id]);
+                                        setTaskProgress(4);
+                                    }}>Submit Assessment</button>
+                                </div>
+                            )}
+
+                            {taskProgress === 4 && (
+                                <div className="animate-fade-in" style={{ textAlign: 'center' }}>
+                                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎉</div>
+                                    <h2>Task Completed!</h2>
+                                    <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Your responses have been successfully recorded. The reward will be added to your account after quality review.</p>
+                                    <button className="btn-primary" onClick={() => { setIsTaskActive(false); setSelectedTask(null); setTaskProgress(1); }}>Return to Dashboard</button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div>
+                    <nav>
+                        <div className="container nav-content">
+                            <a href="#" className="logo">
+                                <img src="./public/logo.png" alt="Prolific" />
+                            </a>
+                            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                {!isLoggedIn ? (
+                                    <>
+                                        <button style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontSize: '0.9rem' }} onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}>Login</button>
+                                        <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }} onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}>Join Now</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        {!isUpgraded ? (
+                                            <button className="btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }} onClick={() => setShowModal(true)}>Upgrade Account</button>
+                                        ) : (
+                                            <div style={{ background: 'var(--glass)', padding: '0.5rem 1rem', borderRadius: '12px', border: '1px solid var(--primary)' }}>
+                                                <span style={{ color: 'var(--primary)', fontWeight: '700' }}>PRO ACCOUNT</span>
+                                                <span style={{ marginLeft: '1rem', opacity: 0.8 }}>$124.50</span>
+                                            </div>
+                                        )}
+                                        <div style={{ width: '32px', height: '32px', background: 'var(--primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }} onClick={() => setIsLoggedIn(false)}>👤</div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </nav>
+
+                    <section className="hero container animate-fade-in">
+                        <div className="hero-flex">
+                            <div className="hero-content">
+                                <h1>The World's Preeminent <br /> Task Marketplace.</h1>
+                                <p>Get paid for your expertise. Join leading platforms like Prolific and OneForma through our integrated dashboard. One free task included for every new member.</p>
+                                {!isLoggedIn ? (
+                                    <button className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.2rem' }} onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}>Create Free Account</button>
+                                ) : !isUpgraded && (
+                                    <button className="btn-primary" style={{ padding: '1.2rem 3rem', fontSize: '1.2rem' }} onClick={() => setShowModal(true)}>Get Pro Access</button>
+                                )}
+                            </div>
+                            <div className="hero-img">
+                                <img src="./public/hero.png" alt="Dashboard Preview" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <main className="container">
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '3rem', flexWrap: 'wrap' }}>
+                            {categories.map(cat => (
+                                <button 
+                                    key={cat} 
+                                    className={`filter-btn ${activeTab === cat ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(cat)}
+                                >{cat}</button>
+                            ))}
+                        </div>
+
+                        <div className="task-grid">
+                            {filteredTasks.map((task, idx) => (
+                                <TaskCard 
+                                    key={task.id} 
+                                    task={task} 
+                                    isLocked={!isUpgraded && task.id !== 1} 
+                                    onUnlock={() => {
+                                        if (!isLoggedIn) {
+                                            setAuthMode('signup');
+                                            setShowAuthModal(true);
+                                        } else {
+                                            setShowModal(true);
+                                        }
+                                    }}
+                                    onOpen={(t) => {
+                                        if (!isLoggedIn) {
+                                            setAuthMode('login');
+                                            setShowAuthModal(true);
+                                        } else {
+                                            setSelectedTask(t);
+                                        }
+                                    }}
+                                />
+                            ))}
+                        </div>
+                    </main>
+
+                    {showAuthModal && (
+                        <div className="modal-overlay" onClick={() => setShowAuthModal(false)}>
+                            <div className="modal-content glass animate-fade-in" style={{ maxWidth: '400px' }} onClick={e => e.stopPropagation()}>
+                                <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{authMode === 'login' ? 'Welcome Back' : 'Create Account'}</h2>
+                                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>{authMode === 'login' ? 'Login to continue earning.' : 'Join the elite task marketplace today.'}</p>
+                                
+                                <div style={{ display: 'grid', gap: '1rem', textAlign: 'left' }}>
+                                    {authMode === 'signup' && (
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>Full Name</label>
+                                            <input type="text" placeholder="John Doe" style={{ width: '100%', padding: '0.8rem', background: 'var(--glass)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white' }} />
+                                        </div>
+                                    )}
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>Email Address</label>
+                                        <input type="email" placeholder="email@example.com" style={{ width: '100%', padding: '0.8rem', background: 'var(--glass)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ fontSize: '0.8rem', opacity: 0.7, display: 'block', marginBottom: '0.5rem' }}>Password</label>
+                                        <input type="password" placeholder="••••••••" style={{ width: '100%', padding: '0.8rem', background: 'var(--glass)', border: '1px solid var(--border)', borderRadius: '8px', color: 'white' }} />
+                                    </div>
+                                    <button className="btn-primary" style={{ width: '100%', padding: '1rem', marginTop: '1rem' }} onClick={() => { setIsLoggedIn(true); setShowAuthModal(false); }}>
+                                        {authMode === 'login' ? 'Login' : 'Create Account'}
+                                    </button>
+                                </div>
+
+                                <p style={{ marginTop: '2rem', fontSize: '0.9rem' }}>
+                                    {authMode === 'login' ? "Don't have an account? " : "Already have an account? "}
+                                    <span style={{ color: 'var(--primary)', cursor: 'pointer' }} onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}>
+                                        {authMode === 'login' ? 'Sign Up' : 'Login'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+                    {showModal && (
+                        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+                            <div className="modal-content glass animate-fade-in" onClick={e => e.stopPropagation()}>
+                                <h2 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Unlock Premium Tasks</h2>
+                                <p style={{ color: 'var(--text-muted)' }}>Get exclusive access to writing, coding, and medical transcription jobs paying up to $50/hr.</p>
+                                <div className="pricing-card">
+                                    <div className="price">$19.99<span>/lifetime</span></div>
+                                    <ul style={{ listStyle: 'none', textAlign: 'left', marginBottom: '2rem', fontSize: '0.9rem' }}>
+                                        <li style={{ marginBottom: '0.5rem' }}>✅ Access 20+ Premium Partner Platforms</li>
+                                        <li style={{ marginBottom: '0.5rem' }}>✅ Instant 24h Bank Payouts</li>
+                                        <li style={{ marginBottom: '0.5rem' }}>✅ Priority Support & Bonus Multipliers</li>
+                                    </ul>
+                                    <button className="btn-primary" style={{ width: '100%', padding: '1rem' }} onClick={() => { setIsUpgraded(true); setShowModal(false); }}>
+                                        Upgrade My Account
+                                    </button>
+                                </div>
+                                <button style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }} onClick={() => setShowModal(false)}>Close</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {selectedTask && (
+                        <div className="modal-overlay" onClick={() => setSelectedTask(null)}>
+                            <div className="modal-content glass animate-fade-in" style={{ maxWidth: '800px', textAlign: 'left' }} onClick={e => e.stopPropagation()}>
+                                <span className="task-badge">{selectedTask.category}</span>
+                                <h2 style={{ fontSize: '2rem', margin: '1rem 0' }}>{selectedTask.title}</h2>
+                                <p style={{ fontSize: '1.1rem', marginBottom: '2rem' }}>{selectedTask.description}</p>
+                                
+                                <div style={{ background: 'var(--glass)', padding: '2rem', borderRadius: '12px', marginBottom: '2rem' }}>
+                                    <h4 style={{ marginBottom: '1rem' }}>Task Instructions:</h4>
+                                    <ol style={{ paddingLeft: '1.2rem', color: 'var(--text-muted)' }}>
+                                        <li>Read the briefing carefully.</li>
+                                        <li>Complete all required fields in the provided form.</li>
+                                        <li>Submit your work for review. Payouts are processed within 24 hours.</li>
+                                    </ol>
+                                </div>
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', gap: '2rem' }}>
+                                        <div>
+                                            <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Est. Time</span>
+                                            <span style={{ fontWeight: '700' }}>{selectedTask.time}</span>
+                                        </div>
+                                        <div>
+                                            <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)' }}>Reward</span>
+                                            <span style={{ fontWeight: '700', color: '#10b981' }}>{selectedTask.reward}</span>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '1rem' }}>
+                                        <button 
+                                            style={{ background: 'var(--glass)', border: '1px solid var(--border)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '12px', cursor: 'pointer' }}
+                                            onClick={() => setSelectedTask(null)}
+                                        >Cancel</button>
+                                        <button className="btn-primary" onClick={() => setIsTaskActive(true)}>Start Task</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <footer style={{ padding: '6rem 0', textAlign: 'center', borderTop: '1px solid var(--border)', marginTop: '4rem' }}>
+                        <p style={{ opacity: 0.5 }}>© 2024 Prolific Marketplace. Premium Task Fulfillment.</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
